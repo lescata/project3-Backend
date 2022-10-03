@@ -44,5 +44,25 @@
     ".fusebox/": "explorerExcludedFiles",
     ".dynamodb/": "explorerExcludedFiles",
     ".tern-port": "explorerExcludedFiles"
-  }
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#89f846",
+    "activityBar.background": "#89f846",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#659df9",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#89f846",
+    "statusBar.background": "#6af615",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#54d008",
+    "statusBarItem.remoteBackground": "#6af615",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#6af615",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#6af61599",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#6af615"
 }
