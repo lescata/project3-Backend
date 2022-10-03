@@ -15,7 +15,8 @@
     "express-jwt": "^7.7.5",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.6.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "react-router-dom": "^6.4.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
