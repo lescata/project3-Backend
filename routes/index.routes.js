@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { isAuthenticated } = require("../Middleware/jwt.middleware");
 const saltRounds = 7;
 
 router.get("/", (req, res, next) => {
@@ -105,6 +106,12 @@ router.post("/sessions", (req, res, next) => {
       }
     })
     .catch((err) => res.status(500).json({ message: "Internal Server Error" }));
+});
+
+
+router.get("/session",isAuthenticated, (req,res,next) => {
+    console.log(req.payload),
+    res.status(200).json(req.paylaod)
 });
 
 module.exports = router;

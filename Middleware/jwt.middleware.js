@@ -10,7 +10,7 @@ const isAuthenticated = jwt({
 
 
 // fonction d'extraction du token de la requet d'authorizaton 
-function getTokenFromHearders (req) {
+function getTokenFromHeaders (req) {
 
      //verification de la presence du token dans le headers
  if(req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
