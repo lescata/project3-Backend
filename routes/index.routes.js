@@ -154,8 +154,8 @@ router.post("/products", (req, res, next) => {
 
 router.get("/products", (req, res, next) => {
   Product.find()
-  .then(productFromDB => {
-    res.status(200).json(productFromDB)
+  .then(productsFromDB => {
+    res.status(200).json(productsFromDB)
   })
   .catch(err => {
     console.log(err); res.status(500).json({ message: "Internal Server Error" })
@@ -166,8 +166,8 @@ router.get("/products/:category", (req, res, next) => {
   const category = req.params.category
 
   Product.find({category})
-  .then(productFromDB => {
-    res.status(200).json(productFromDB)
+  .then(productsFromDB => {
+    res.status(200).json(productsFromDB)
   })
   .catch(err => {
     console.log(err); res.status(500).json({ message: "Internal Server Error" })
