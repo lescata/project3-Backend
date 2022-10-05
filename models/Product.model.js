@@ -2,7 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const userSchema = new Schema({
     name : String,
-    category: String,
+    category: {
+        type: String,
+        enum: ["televisions", "laptops", "consoles"]
+    },
     price:{
         value: Number,
         currency:{
@@ -10,12 +13,13 @@ const userSchema = new Schema({
             default: "EUR"
         }
     },
+    description: String,
     stock: Number,
     Note: Number,
     images: Array,
-    details:[
+    details: [
         {
-            Name: String,
+            name: String,
             value: String
         }
     ]

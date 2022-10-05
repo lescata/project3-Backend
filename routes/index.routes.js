@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require("../models/User.model");
+const Product = require("../models/Product.model")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../Middleware/jwt.middleware");
@@ -111,7 +112,44 @@ router.post("/sessions", (req, res, next) => {
 
 router.get("/session",isAuthenticated, (req,res,next) => {
     console.log(req.payload),
-    res.status(200).json(req.paylaod)
+    res.status(200).json(req.payload)
 });
+
+/* Schema Json à envoyer pour le POST /products
+{
+    "name": "test1",
+    "category": "test2",
+    "value": 450,
+    "images": ["test.png","test2.png"],
+    "description": "whaaa cette telé est trop bi1",
+    "details":[
+        {
+            "name": "name1",
+            "value": "value1"
+        },
+                {
+            "name": "name2",
+            "value": "value2"
+        }
+    ]
+}
+*/
+router.post("/products", (req, res, next) => {
+  const {name, category, value, images, details} = req.body
+
+  Product.create({
+    name,
+    category,
+    price:{value},
+    images,
+    details
+  })
+  .then(()=>{
+    res.status(201).json({message: "OK"})
+  })
+  .catch(err => {
+    console.log(err); res.status(500).json({ message: "Internal Server Error" })
+  })
+})
 
 module.exports = router;

@@ -54,6 +54,7 @@
     ".yarn-integrity": "explorerExcludedFiles",
     ".env": "explorerExcludedFiles",
     ".env.test": "explorerExcludedFiles",
+    ".DS_Store": "explorerExcludedFiles",
     ".cache": "explorerExcludedFiles",
     ".next": "explorerExcludedFiles",
     ".nuxt": "explorerExcludedFiles",
