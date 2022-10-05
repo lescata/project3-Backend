@@ -65,50 +65,46 @@ router.post("/users", (req, res, next) => {
       console.log(err);
       res.status(500).json({ message: "Internal Server Error" });
     });
-})
+});
 
 //  ╦  ┌─┐┌─┐┌─┐┬┌┐┌
 //  ║  │ ││ ┬│ ┬││││
 //  ╩═╝└─┘└─┘└─┘┴┘└┘
 
-router.post('/sessions', (req, res, next) => {
+router.post("/sessions", (req, res, next) => {
   const { email, password } = req.body;
 
   // Verification de la presence de l'email et du password dans le formulaire
-  if (email === ''|| password === ''){
-    res.status(400).json({message:"Please provide Both Email & Password."});
+  if (email === "" || password === "") {
+    res.status(400).json({ message: "Please provide Both Email & Password." });
     return;
   }
   //Verification de l'utilisateur (email) dans la Db
-  User.findOne({email})
+  User.findOne({ email })
     .then((foundUser) => {
-
-      if(!foundUser){
-        res.status(401).json({message: "User could not be found."});
+      if (!foundUser) {
+        res.status(401).json({ message: "User could not be found." });
         return;
       }
-      //comparaison du password recu vs celui dans la DB 
+      //comparaison du password recu vs celui dans la DB
       const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
 
       if (passwordCorrect) {
-        const { _id, email} = foundUser;
+        const { _id, email } = foundUser;
 
-        const payload = {_id, email};
+        const payload = { _id, email };
 
-        const authToken = jwt.sign(
-          payload,
-          process.env.TOKEN_SECRET,
-          {algorithm: 'HS256', expiresIn:'5h'}
-        );
+        const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+          algorithm: "HS256",
+          expiresIn: "5h",
+        });
 
-        res.status(200).json({authToken: authToken});
-      }
-      else {
-        res.status(401).json({message: "Unable to authenticate the user"});
+        res.status(200).json({ authToken: authToken });
+      } else {
+        res.status(401).json({ message: "Unable to authenticate the user" });
       }
     })
-  .catch(err => res.status(500).json({message:"Internal Server Error"}));
+    .catch((err) => res.status(500).json({ message: "Internal Server Error" }));
 });
-
 
 module.exports = router;
