@@ -178,48 +178,20 @@ router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("OK
 
 router.post("/cart", (req, res, next) => {
   const _id = req.query._id
+  //console.log("before:", req.session.cart)
 
-  //req.session.cart = []
- 
-  //const productIndex = req.session.cart.indexOf(_id)
-
-  // console.log("length=",cart[0])
-  // cart.forEach((product, index) =>{
-  //   console.log("test")
-  //   if(product._id === _id){
-  //     const stock = req.session.cart[req.session.cart.indexOf(index)].stock
-  //     req.session.cart[req.session.cart.indexOf(index)].stock = stock + 1
-  //     console.log(req.session.cart)
-  //     return
-  //   }
-  // })
-  // console.log("productIndex:",productIndex)
-
-
-  let cart = req.session.cart
-  let result = cart.find((product, index) => {
+  const result = req.session.cart.findIndex((product, index) => {
     if(product._id === _id){
-      console.log("index:",index)
-      return index
-    } else {return false}
+      return true
+    }
   })
 
-  console.log("result:",result)
-
-  if (result){
-    console.log("ouais")
-    req.session.cart[0].stock = req.session.cart[0].stock + 1
+  if (result !== -1){
+    req.session.cart[result].stock = req.session.cart[result].stock + 1
     console.log(req.session.cart)
-    res.send("1")
+    res.send("Stock add to product")
     return
   }
-  //let result = cart.indexOf(_id)
-  // if (cart.includes(product => product._id === _id)){
-  //   const stock = req.session.cart[req.session.cart.indexOf(_id)].stock
-  //   req.session.cart[req.session.cart.indexOf(_id)].stock = stock + 1
-  //   console.log(req.session.cart)
-  //   return
-  // }
 
   Product.findById(_id)
   .then(productFromDB =>{
@@ -230,10 +202,9 @@ router.post("/cart", (req, res, next) => {
       stock: 1
     }
     req.session.cart.push(productCart)
-    console.log(req.session.cart)
+    console.log("after:", req.session.cart)
+    res.send("Create OK")
   })
   .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
-
-  res.send("2")
 })
 module.exports = router;
