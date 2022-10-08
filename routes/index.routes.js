@@ -4,6 +4,7 @@ const Product = require("../models/Product.model")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {isAuthenticated} = require("../Middleware/jwt.middleware");
+const fileUploader = require("../config/cloudinary.config")
 const saltRounds = 7;
 
 router.get("/", (req, res, next) => {
@@ -114,6 +115,19 @@ router.get("/session",isAuthenticated, (req,res,next) => {
     console.log(req.payload),
     res.status(200).json(req.payload)
 });
+
+router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,next) => {
+  if (!req.file){
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  res.json({image: req.file.path});
+})
+
+
+
+
+
 
 /* Schema Json à envoyer pour le POST /products
 {
