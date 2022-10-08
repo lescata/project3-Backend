@@ -174,4 +174,66 @@ router.get("/products/:category", (req, res, next) => {
   })
 })
 
+router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("OK")})
+
+router.post("/cart", (req, res, next) => {
+  const _id = req.query._id
+
+  //req.session.cart = []
+ 
+  //const productIndex = req.session.cart.indexOf(_id)
+
+  // console.log("length=",cart[0])
+  // cart.forEach((product, index) =>{
+  //   console.log("test")
+  //   if(product._id === _id){
+  //     const stock = req.session.cart[req.session.cart.indexOf(index)].stock
+  //     req.session.cart[req.session.cart.indexOf(index)].stock = stock + 1
+  //     console.log(req.session.cart)
+  //     return
+  //   }
+  // })
+  // console.log("productIndex:",productIndex)
+
+
+  let cart = req.session.cart
+  let result = cart.find((product, index) => {
+    if(product._id === _id){
+      console.log("index:",index)
+      return index
+    } else {return false}
+  })
+
+  console.log("result:",result)
+
+  if (result){
+    console.log("ouais")
+    req.session.cart[0].stock = req.session.cart[0].stock + 1
+    console.log(req.session.cart)
+    res.send("1")
+    return
+  }
+  //let result = cart.indexOf(_id)
+  // if (cart.includes(product => product._id === _id)){
+  //   const stock = req.session.cart[req.session.cart.indexOf(_id)].stock
+  //   req.session.cart[req.session.cart.indexOf(_id)].stock = stock + 1
+  //   console.log(req.session.cart)
+  //   return
+  // }
+
+  Product.findById(_id)
+  .then(productFromDB =>{
+    const productCart = {
+      _id,
+      name: productFromDB.name,
+      image: productFromDB.images[0],
+      stock: 1
+    }
+    req.session.cart.push(productCart)
+    console.log(req.session.cart)
+  })
+  .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
+
+  res.send("2")
+})
 module.exports = router;

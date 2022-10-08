@@ -13,6 +13,9 @@ const cookieParser = require("cookie-parser");
 // unless the request if from the same domain, by default express wont accept POST requests
 const cors = require("cors");
 
+const MongoStore = require("connect-mongo");
+const session = require("express-session");
+
 // Middleware configuration
 module.exports = (app) => {
   // Because this is a server that will accept requests from outside and it will be hosted ona server with a `proxy`, express needs to know that it should trust that setting.
@@ -34,4 +37,23 @@ module.exports = (app) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
+
+  // req.session
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET || "super hyper secret key",
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+      }),
+    })
+  );
+
+  // req.session.cart
+  app.use(function (req, res, next) {
+    req.session.cart ||= []
+
+    next()
+  })
 };
