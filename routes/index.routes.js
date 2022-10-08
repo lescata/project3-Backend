@@ -3,7 +3,7 @@ const User = require("../models/User.model");
 const Product = require("../models/Product.model")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { isAuthenticated } = require("../Middleware/jwt.middleware");
+const {isAuthenticated} = require("../Middleware/jwt.middleware");
 const saltRounds = 7;
 
 router.get("/", (req, res, next) => {
@@ -148,7 +148,7 @@ router.post("/products", (req, res, next) => {
     res.status(201).json({message: "OK"})
   })
   .catch(err => {
-    console.log(err); res.status(500).json({ message: "Internal Server Error" })
+    console.log(err); res.status(500).json({ message: "Internal Server Error: Product NOT created" })
   })
 })
 
@@ -158,7 +158,7 @@ router.get("/products", (req, res, next) => {
     res.status(200).json(productsFromDB)
   })
   .catch(err => {
-    console.log(err); res.status(500).json({ message: "Internal Server Error" })
+    console.log(err); res.status(500).json({ message: "Internal Server Error, Could not find/reach the Product" })
   })
 })
 
@@ -170,7 +170,7 @@ router.get("/products/:category", (req, res, next) => {
     res.status(200).json(productsFromDB)
   })
   .catch(err => {
-    console.log(err); res.status(500).json({ message: "Internal Server Error" })
+    console.log(err); res.status(500).json({ message: "Internal Server Error, Could not find/reach the category" })
   })
 })
 
