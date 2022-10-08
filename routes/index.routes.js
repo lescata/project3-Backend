@@ -130,6 +130,7 @@ router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,n
     "value": 450,
     "images": ["test.png","test2.png"],
     "description": "whaaa cette telé est trop bi1",
+    "stock": 10,
     "details":[
         {
             "name": "name1",
@@ -187,19 +188,22 @@ router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("De
 router.post("/cart", (req, res, next) => {
   const _id = req.query._id
 
+  // Va rechercher l'index du produit s'il existe deja dans le req.session.cart
   const result = req.session.cart.findIndex((product, index) => {
     if(product._id === _id){
       return true
     }
   })
 
+  // S'il trouve un resultat, ajout 1 dans le stock du produit selectionné
   if (result !== -1){
     req.session.cart[result].stock = req.session.cart[result].stock + 1
-    console.log(req.session.cart)
+    //console.log(req.session.cart)
     res.status(200).send(req.session.cart)
     return
   }
 
+  // Creation du produit dans le req.session.cart
   Product.findById(_id)
   .then(productFromDB =>{
     const productCart = {
@@ -209,13 +213,14 @@ router.post("/cart", (req, res, next) => {
       stock: 1
     }
     req.session.cart.push(productCart)
-    console.log("after:", req.session.cart)
+    //console.log("after:", req.session.cart)
     res.status(201).send(req.session.cart)
   })
   .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
 })
 
 router.get("/cart", (req, res, next) => {
+  console.log("get session:",req.session.cart)
   res.status(200).json(req.session.cart)
 })
 module.exports = router;

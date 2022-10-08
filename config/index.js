@@ -26,7 +26,7 @@ module.exports = (app) => {
   app.use(
     cors({
       credentials: true,
-      origin: process.env.ORIGIN || "http://localhost:3000",
+      origin: process.env.ORIGIN || "http://localhost:5005",
     })
   );
 
@@ -47,6 +47,10 @@ module.exports = (app) => {
       store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI,
       }),
+      cookie:{
+        httpOnly: true,
+        maxAge: parseInt(process.env.SESSION_MAX_AGE)
+      }
     })
   );
 
