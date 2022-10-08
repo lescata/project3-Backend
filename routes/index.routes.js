@@ -123,12 +123,6 @@ router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,n
   }
   res.json({image: req.file.path});
 })
-
-
-
-
-
-
 /* Schema Json à envoyer pour le POST /products
 {
     "name": "test1",
@@ -192,7 +186,6 @@ router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("OK
 
 router.post("/cart", (req, res, next) => {
   const _id = req.query._id
-  //console.log("before:", req.session.cart)
 
   const result = req.session.cart.findIndex((product, index) => {
     if(product._id === _id){
