@@ -185,6 +185,23 @@ router.get("/products/:category", (req, res, next) => {
 
 router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("Delete OK")})
 
+router.delete("/cart/:_id", (req, res, next) => { 
+  const result = req.session.cart.findIndex((product, index) => {
+    if(product._id === req.params._id){
+      return true
+    }
+  })
+
+  if(result !== -1){
+    let copy = [...req.session.cart]
+    copy.splice(result,1)
+    req.session.cart = copy
+    
+    return res.status(202).json(copy)
+  }
+  res.status(204).send()
+})
+
 router.post("/cart", (req, res, next) => {
   const _id = req.query._id
 
@@ -210,7 +227,8 @@ router.post("/cart", (req, res, next) => {
       _id,
       name: productFromDB.name,
       image: productFromDB.images[0],
-      stock: 1
+      price: productFromDB.price.value,
+      quantity: 1
     }
     req.session.cart.push(productCart)
     //console.log("after:", req.session.cart)
@@ -219,8 +237,14 @@ router.post("/cart", (req, res, next) => {
   .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
 })
 
+router.put("/cart", (req, res, next) => {
+  req.session.cart = req.body
+  res.status(200).send("OK")
+})
+
 router.get("/cart", (req, res, next) => {
   console.log("get session:",req.session.cart)
+  //req.session.cart = []
   res.status(200).json(req.session.cart)
 })
 module.exports = router;
