@@ -162,7 +162,13 @@ router.post("/products", (req, res, next) => {
 })
 
 router.get("/products", (req, res, next) => {
-  Product.find()
+  const {q} = req.query
+  console.log("q:",q) // ex: "Sam"
+
+  const regex = new RegExp(q, "i") // soit la regex: /Sam/i
+
+  Product.find({name: regex}) // tous les produits contenant "Sam" (case-insensitive)
+  .limit(5)
   .then(productsFromDB => {
     res.status(200).json(productsFromDB)
   })
@@ -238,7 +244,18 @@ router.post("/cart", (req, res, next) => {
 })
 
 router.put("/cart", (req, res, next) => {
-  req.session.cart = req.body
+  const arr = []
+  req.body.forEach(el => {
+    const object = {
+      name: el.name,
+      image: el.image,
+      price: el.price,
+      quantity: el.quantity
+    }
+    arr.push(object)
+  })
+
+  req.session.cart = arr
   res.status(200).send("OK")
 })
 
@@ -247,4 +264,5 @@ router.get("/cart", (req, res, next) => {
   //req.session.cart = []
   res.status(200).json(req.session.cart)
 })
+
 module.exports = router;
