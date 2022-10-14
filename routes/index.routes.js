@@ -246,17 +246,21 @@ router.post("/cart", (req, res, next) => {
 router.put("/cart", (req, res, next) => {
   const arr = []
   req.body.forEach(el => {
+    let quantity = -1
+    if(el.quantity < 1){quantity = 1} else {quantity = el.quantity}
+
     const object = {
       name: el.name,
       image: el.image,
-      price: el.price,
-      quantity: el.quantity
+      price : el.price,
+      quantity
     }
     arr.push(object)
   })
 
   req.session.cart = arr
-  res.status(200).send("OK")
+  console.log("arr", arr)
+  res.status(200).json(arr)
 })
 
 router.get("/cart", (req, res, next) => {
