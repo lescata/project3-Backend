@@ -15,7 +15,7 @@ const userSchema = new Schema({
     },
     description: String,
     stock: Number,
-    Note: Number,
+    note: Number,
     images: Array,
     details: [
         {

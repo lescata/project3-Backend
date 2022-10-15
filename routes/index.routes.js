@@ -161,6 +161,8 @@ router.post("/products", (req, res, next) => {
   })
 })
 
+
+
 router.get("/products", (req, res, next) => {
   const {q} = req.query
   console.log("q:",q) // ex: "Sam"
@@ -175,6 +177,17 @@ router.get("/products", (req, res, next) => {
   .catch(err => {
     console.log(err); res.status(500).json({ message: "Internal Server Error, Could not find/reach the Product" })
   })
+})
+
+router.get("/product/:_id", (req, res, next) => {
+  const {_id} = req.params
+
+  if (_id){
+    Product.findById(_id)
+    .then(productFromDB => res.status(200).json(productFromDB))
+    .catch(err => {console.log(err); res.status(404).send("Nothing")})
+  }
+
 })
 
 router.get("/products/:category", (req, res, next) => {
@@ -230,7 +243,7 @@ router.post("/cart", (req, res, next) => {
   Product.findById(_id)
   .then(productFromDB =>{
     const productCart = {
-      _id,
+      _id: productFromDB._id,
       name: productFromDB.name,
       image: productFromDB.images[0],
       price: productFromDB.price.value,
@@ -250,6 +263,7 @@ router.put("/cart", (req, res, next) => {
     if(el.quantity < 1){quantity = 1} else {quantity = el.quantity}
 
     const object = {
+      _id: el._id,
       name: el.name,
       image: el.image,
       price : el.price,
