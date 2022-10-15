@@ -1,6 +1,9 @@
 const router = require("express").Router();
+
 const User = require("../models/User.model");
 const Product = require("../models/Product.model")
+const Order = require("../models/Order.model")
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {isAuthenticated} = require("../Middleware/jwt.middleware");
@@ -73,6 +76,9 @@ router.post("/users", (req, res, next) => {
 //  ╦  ┌─┐┌─┐┌─┐┬┌┐┌
 //  ║  │ ││ ┬│ ┬││││
 //  ╩═╝└─┘└─┘└─┘┴┘└┘
+router.get('/verify', isAuthenticated, (req, res, next) => {
+  res.status(200).json(req.payload);
+});
 
 router.post("/sessions", (req, res, next) => {
   const { email, password } = req.body;
@@ -144,7 +150,7 @@ router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,n
     ]
 }
 */
-router.post("/products", (req, res, next) => {
+router.post("/products", isAuthenticated, (req, res, next) => {
   const {name, category, value, images, details} = req.body
 
   Product.create({
@@ -279,9 +285,16 @@ router.put("/cart", (req, res, next) => {
 })
 
 router.get("/cart", (req, res, next) => {
-  console.log("get session:",req.session.cart)
-  //req.session.cart = []
   res.status(200).json(req.session.cart)
 })
 
+router.get("/orders", isAuthenticated, (req, res, next) => {
+  console.log(`req.payload= `, req.payload);
+  const { _id } = req.payload
+  Order.find({customer: _id})
+  .then(ordersFromDB=> {
+    res.status(201).json(ordersFromDB)
+  })
+  .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
+})
 module.exports = router;

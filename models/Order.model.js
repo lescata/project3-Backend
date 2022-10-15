@@ -30,4 +30,4 @@ const userSchema = new Schema({
 
 const Order = model("Order", userSchema);
 
-module.exports = Product;
+module.exports = Order;
