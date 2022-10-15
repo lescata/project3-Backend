@@ -76,6 +76,7 @@ router.post("/users", (req, res, next) => {
 
 router.post("/sessions", (req, res, next) => {
   const { email, password } = req.body;
+  console.log (email , password);
 
   // Verification de la presence de l'email et du password dans le formulaire
   if (email === "" || password === "") {
