@@ -82,7 +82,6 @@ router.get('/verify', isAuthenticated, (req, res, next) => {
 
 router.post("/sessions", (req, res, next) => {
   const { email, password } = req.body;
-  console.log (email , password);
 
   // Verification de la presence de l'email et du password dans le formulaire
   if (email === "" || password === "") {
@@ -119,7 +118,6 @@ router.post("/sessions", (req, res, next) => {
 
 
 router.get("/session",isAuthenticated, (req,res,next) => {
-    console.log(req.payload),
     res.status(200).json(req.payload)
 });
 
@@ -168,12 +166,8 @@ router.post("/products", isAuthenticated, (req, res, next) => {
   })
 })
 
-
-
 router.get("/products", (req, res, next) => {
   const {q} = req.query
-  console.log("q:",q) // ex: "Sam"
-
   const regex = new RegExp(q, "i") // soit la regex: /Sam/i
 
   Product.find({name: regex}) // tous les produits contenant "Sam" (case-insensitive)
@@ -241,7 +235,6 @@ router.post("/cart", (req, res, next) => {
   // S'il trouve un resultat, ajout 1 dans le stock du produit selectionné
   if (result !== -1){
     req.session.cart[result].stock = req.session.cart[result].stock + 1
-    //console.log(req.session.cart)
     res.status(200).send(req.session.cart)
     return
   }
@@ -257,7 +250,6 @@ router.post("/cart", (req, res, next) => {
       quantity: 1
     }
     req.session.cart.push(productCart)
-    //console.log("after:", req.session.cart)
     res.status(201).send(req.session.cart)
   })
   .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
@@ -280,7 +272,6 @@ router.put("/cart", (req, res, next) => {
   })
 
   req.session.cart = arr
-  console.log("arr", arr)
   res.status(200).json(arr)
 })
 
@@ -289,11 +280,48 @@ router.get("/cart", (req, res, next) => {
 })
 
 router.get("/orders", isAuthenticated, (req, res, next) => {
-  console.log(`req.payload= `, req.payload);
   const { _id } = req.payload
   Order.find({customer: _id})
   .then(ordersFromDB=> {
-    res.status(201).json(ordersFromDB)
+    res.status(200).json(ordersFromDB)
+  })
+  .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
+})
+
+router.get("/profile", isAuthenticated, (req, res, next) => {
+  User.findById(req.payload._id)
+  .then(userFromDB=>{
+    console.log(userFromDB)
+    res.status(200).json(userFromDB)
+  })
+  .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
+})
+
+router.put("/profile", isAuthenticated, (req, res, next) => {
+  const {firstName, lastName, email, number, street, city, country, password } = req.body
+
+  User.findByIdAndUpdate(req.payload._id,{
+    firstName,
+    lastName,
+    email,
+    address:{
+      number,
+      street,
+      city,
+      country
+    }
+
+  })
+  .then(()=> {
+    if (password){
+      const salt = bcrypt.genSaltSync(saltRounds);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+      User.findByIdAndUpdate(req.payload._id,{
+        password: hashedPassword
+      })
+      .then(res.status(201).json({message: "Password changed with success"}))
+      .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
+    }else { res.status(201).json({message: "Profile changed with success"}) }
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
