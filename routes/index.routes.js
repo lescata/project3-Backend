@@ -148,6 +148,7 @@ router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,n
     ]
 }
 */
+
 router.post("/products", isAuthenticated, (req, res, next) => {
   const {name, category, value, images, details} = req.body
 
@@ -325,4 +326,40 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
+
+
+router.post("/payment", (req, res, next) => {
+  const { pan, name, cvv, expiry } = req.body;
+
+  console.log("LLlllllllllllllaaaaaaaaaa",req.payload)
+  if (pan === "" || name === "" || cvv === "" || expiry === "") {
+    res.status(400).json({ message: "Provide full page details" });
+  }
+
+  const passwordRegex = /(?=.*[0-9]).{16,}/;
+  if (!passwordRegex.test(pan)) {
+    res.status(400).json({
+      message:
+        "Please Provide a Valide Credit Card Number",
+    });
+    return;
+  }
+
+     Order.create({
+      customer: this.report.payload._id,
+      date: new Date(),
+      products: req.session.cart 
+     })
+
+    .then((reponse) => {
+      res.status(201).json({message: "success"});
+      req.session.cart=[];
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: "Internal Server Error" });
+    });
+});
+
+
 module.exports = router;
