@@ -339,7 +339,7 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
 
-PAYMENT
+//PAYMENT
 
 router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
