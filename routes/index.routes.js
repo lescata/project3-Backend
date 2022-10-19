@@ -300,6 +300,7 @@ router.get("/orders", isAuthenticated, (req, res, next) => {
     populate: { path: 'productId' } // Populate le productID
   })
   .then(ordersFromDB=> {
+    console.log(ordersFromDB)
     res.status(200).json(ordersFromDB)
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
