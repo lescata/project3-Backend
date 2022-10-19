@@ -328,9 +328,10 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
 })
 
 
-router.post("/payment", (req, res, next) => {
+router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
 
+  
   console.log("LLlllllllllllllaaaaaaaaaa",req.payload)
   if (pan === "" || name === "" || cvv === "" || expiry === "") {
     res.status(400).json({ message: "Provide full page details" });
@@ -345,10 +346,22 @@ router.post("/payment", (req, res, next) => {
     return;
   }
 
+  let cart = []
+  req.session.cart.forEach(el=>{
+    let object = {
+      productId: el._id,
+      quantity: el.quantity,
+      price:{
+        value: el.price
+      }
+    }
+    cart.push(object)
+  })
+
      Order.create({
-      customer: this.report.payload._id,
+      customer: req.payload._id,
       date: new Date(),
-      products: req.session.cart 
+      products: cart
      })
 
     .then((reponse) => {
