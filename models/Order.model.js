@@ -9,7 +9,10 @@ const userSchema = new Schema({
     products: [
         {
             name: String,
-            image: String,
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: "Product"
+            },
             quantity: Number,
             price: {
                 value: Number,

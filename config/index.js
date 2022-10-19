@@ -26,7 +26,7 @@ module.exports = (app) => {
   app.use(
     cors({
       credentials: true,
-      origin: "https://jmaterial.netlify.app/",
+      origin: process.env.ORIGIN || "http://localhost:5005",
     })
   );
 
