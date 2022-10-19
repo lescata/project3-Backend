@@ -287,13 +287,17 @@ router.put("/cart", (req, res, next) => {
 
 // Recuperation des informations de panier
 router.get("/cart", (req, res, next) => {
+  //console.log(req.session.cart)
   res.status(200).json(req.session.cart)
 })
 
 // Recuperation des informations de commandes
 router.get("/orders", isAuthenticated, (req, res, next) => {
-  const { _id } = req.payload
-  Order.find({customer: _id})
+  Order.find( {customer: req.payload._id} )
+  .populate({
+    path: 'products', // Va dans le tableau products
+    populate: { path: 'productId' } // Populate le productID
+  })
   .then(ordersFromDB=> {
     res.status(200).json(ordersFromDB)
   })
@@ -304,7 +308,6 @@ router.get("/orders", isAuthenticated, (req, res, next) => {
 router.get("/profile", isAuthenticated, (req, res, next) => {
   User.findById(req.payload._id)
   .then(userFromDB=>{
-    console.log(userFromDB)
     res.status(200).json(userFromDB)
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
@@ -344,23 +347,20 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
 router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
 
-  
-  console.log("LLlllllllllllllaaaaaaaaaa",req.payload)
   if (pan === "" || name === "" || cvv === "" || expiry === "") {
     res.status(400).json({ message: "Provide full page details" });
   }
 
   const passwordRegex = /(?=.*[0-9]).{16,}/;
   if (!passwordRegex.test(pan)) {
-    res.status(400).json({
+    return res.status(400).json({
       message:
         "Please Provide a Valide Credit Card Number",
     });
-    return;
   }
 
   let cart = []
-  req.session.cart.forEach(el=>{
+  req.session.cart.forEach(el=> {
     let object = {
       productId: el._id,
       quantity: el.quantity,
@@ -371,13 +371,21 @@ router.post("/payment", isAuthenticated,(req, res, next) => {
     cart.push(object)
   })
 
+  let totalPrice = 0
+  req.session.cart.forEach(el=> {
+    totalPrice = totalPrice + el.price
+  })
+
      Order.create({
       customer: req.payload._id,
       date: new Date(),
-      products: cart
+      status: "send",
+      products: cart,
+      totalPrice:{
+        value: totalPrice
+      }
      })
-
-    .then((reponse) => {
+    .then(() => {
       res.status(201).json({message: "success"});
       req.session.cart=[];
     })
