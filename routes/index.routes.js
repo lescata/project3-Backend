@@ -295,8 +295,11 @@ router.get("/cart", (req, res, next) => {
 // Recuperation des informations de commandes
 router.get("/orders", isAuthenticated, (req, res, next) => {
   Order.find( {customer: req.payload._id} )
+  .populate({
+    path: 'products', // Va dans le tableau products
+    populate: { path: 'productId' } // Populate le productID
+  })
   .then(ordersFromDB=> {
-    console.log(ordersFromDB)
     res.status(200).json(ordersFromDB)
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
@@ -340,6 +343,7 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
 })
 
 //PAYMENT
+
 router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
 
@@ -358,7 +362,7 @@ router.post("/payment", isAuthenticated,(req, res, next) => {
   let cart = []
   req.session.cart.forEach(el=> {
     let object = {
-      image: el.image,
+      productId: el._id,
       quantity: el.quantity,
       price:{
         value: el.price
