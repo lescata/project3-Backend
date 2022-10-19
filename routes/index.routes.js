@@ -18,14 +18,12 @@ router.get("/", (req, res, next) => {
 // ║  ├┬┘├┤ ├─┤ │ ├┤ └─┐  ├─┤  │││├┤ │││  │ │└─┐├┤ ├┬┘  ││││   │ ├─┤├┤    ││├─┤ │ ├─┤├┴┐├─┤└─┐├┤
 // ╚═╝┴└─└─┘┴ ┴ ┴ └─┘└─┘  ┴ ┴  ┘└┘└─┘└┴┘  └─┘└─┘└─┘┴└─  ┴┘└┘   ┴ ┴ ┴└─┘  ─┴┘┴ ┴ ┴ ┴ ┴└─┘┴ ┴└─┘└─┘
 
-// Creation utilisateur
 router.post("/users", (req, res, next) => {
   const { email, password, lastName, firstName } = req.body;
 
   // si email - password - nom sont vides
   // il m'envoie une reponse avec un .status (400) en .json avec un message qui me demande de
   // fournir les elements demandées
-
 
   if (email === "" || password === "" || firstName === "" || lastName === "") {
     res.status(400).json({ message: "Provide email, password and name" });
@@ -45,7 +43,6 @@ router.post("/users", (req, res, next) => {
     return;
   }
 
-  // Verifie l'email
   User.findOne({ email })
     .then((foundUser) => {
       if (foundUser) {
@@ -53,7 +50,6 @@ router.post("/users", (req, res, next) => {
         return;
       }
 
-      // L'email n'existe pas -> creation de l'utilisateur
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -68,6 +64,7 @@ router.post("/users", (req, res, next) => {
       const { email, name, _id } = createdUser;
 
       const user = { email, firstName, lastName, _id };
+
       res.status(201).json({ user: user });
     })
     .catch((err) => {
@@ -80,7 +77,6 @@ router.post("/users", (req, res, next) => {
 //  ║  │ ││ ┬│ ┬││││
 //  ╩═╝└─┘└─┘└─┘┴┘└┘
 
-// Creation du token
 router.post("/sessions", (req, res, next) => {
   const { email, password } = req.body;
 
@@ -117,7 +113,7 @@ router.post("/sessions", (req, res, next) => {
     .catch((err) => res.status(500).json({ message: "Internal Server Error" }));
 });
 
-// Retourne les infos utilisateurs
+
 router.get("/session",isAuthenticated, (req,res,next) => {
     res.status(200).json(req.payload)
 });
@@ -150,7 +146,6 @@ router.post("/upload", isAuthenticated, fileUploader.single("image"), (req,res,n
 }
 */
 
-// Creation d'un produit
 router.post("/products", isAuthenticated, (req, res, next) => {
   const {name, category, value, images, details} = req.body
 
@@ -169,7 +164,6 @@ router.post("/products", isAuthenticated, (req, res, next) => {
   })
 })
 
-// Recuperation des infos de produits pour la barre de recherche
 router.get("/products", (req, res, next) => {
   const {q} = req.query
   const regex = new RegExp(q, "i") // soit la regex: /Sam/i
@@ -184,7 +178,6 @@ router.get("/products", (req, res, next) => {
   })
 })
 
-// Recuperation des informations d'un produit
 router.get("/product/:_id", (req, res, next) => {
   const {_id} = req.params
 
@@ -196,7 +189,6 @@ router.get("/product/:_id", (req, res, next) => {
 
 })
 
-// Recuperation d'une liste de categorie contenant tous leurs produits
 router.get("/products/:category", (req, res, next) => {
   const category = req.params.category
 
@@ -209,10 +201,8 @@ router.get("/products/:category", (req, res, next) => {
   })
 })
 
-// Suppression total du panier
 router.delete("/cart", (req, res, next) => { req.session.cart = []; res.send("Delete OK")})
 
-// Suppression d'un produit dans le panier
 router.delete("/cart/:_id", (req, res, next) => { 
   const result = req.session.cart.findIndex((product, index) => {
     if(product._id === req.params._id){
@@ -230,7 +220,6 @@ router.delete("/cart/:_id", (req, res, next) => {
   res.status(204).send()
 })
 
-// Ajout du produit dans le panier
 router.post("/cart", (req, res, next) => {
   const _id = req.query._id
 
@@ -264,7 +253,10 @@ router.post("/cart", (req, res, next) => {
   .catch(err => { console.log(err); res.status(500).json({ message: "Internal Server Error, Could not add product to cart :",err }) })
 })
 
-// Modificaction de la quantité du produit dans le panier
+  // ╔═╗┌─┐┌┬┐  ╔═╗╔═╗╦═╗╔╦╗  
+  // ║ ╦├┤  │   ║  ╠═╣╠╦╝ ║   
+  // ╚═╝└─┘ ┴   ╚═╝╩ ╩╩╚═ ╩   
+
 router.put("/cart", (req, res, next) => {
   const arr = []
   req.body.forEach(el => {
@@ -284,12 +276,21 @@ router.put("/cart", (req, res, next) => {
   req.session.cart = arr
   res.status(200).json(arr)
 })
+                                     
+                       
+// ╔═╗╔═╗┌┬┐  ╔═╗╔═╗╦═╗╔╦╗
+// ║ ╦║╣  │   ║  ╠═╣╠╦╝ ║ 
+// ╚═╝╚═╝ ┴   ╚═╝╩ ╩╩╚═ ╩ 
 
-// Recuperation des informations de panier
 router.get("/cart", (req, res, next) => {
   //console.log(req.session.cart)
   res.status(200).json(req.session.cart)
 })
+
+
+// ┌─┐┬─┐┌┬┐┌─┐┬─┐  ┬  ┬┌─┐┌┬┐
+// │ │├┬┘ ││├┤ ├┬┘  │  │└─┐ │ 
+// └─┘┴└──┴┘└─┘┴└─  ┴─┘┴└─┘ ┴ 
 
 // Recuperation des informations de commandes
 router.get("/orders", isAuthenticated, (req, res, next) => {
@@ -304,7 +305,6 @@ router.get("/orders", isAuthenticated, (req, res, next) => {
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
 
-// Recuperation des informations de profile
 router.get("/profile", isAuthenticated, (req, res, next) => {
   User.findById(req.payload._id)
   .then(userFromDB=>{
@@ -313,7 +313,6 @@ router.get("/profile", isAuthenticated, (req, res, next) => {
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
 
-// Mise à jour du profil
 router.put("/profile", isAuthenticated, (req, res, next) => {
   const {firstName, lastName, email, number, street, city, country, password } = req.body
 
@@ -343,6 +342,7 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
 
+//PAYMENT
 
 router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
