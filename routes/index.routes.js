@@ -339,4 +339,53 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
   })
   .catch(err=> {console.log(err); res.status(500).json({message: "Server error"})})
 })
+
+
+router.post("/payment", isAuthenticated,(req, res, next) => {
+  const { pan, name, cvv, expiry } = req.body;
+
+  
+  console.log("LLlllllllllllllaaaaaaaaaa",req.payload)
+  if (pan === "" || name === "" || cvv === "" || expiry === "") {
+    res.status(400).json({ message: "Provide full page details" });
+  }
+
+  const passwordRegex = /(?=.*[0-9]).{16,}/;
+  if (!passwordRegex.test(pan)) {
+    res.status(400).json({
+      message:
+        "Please Provide a Valide Credit Card Number",
+    });
+    return;
+  }
+
+  let cart = []
+  req.session.cart.forEach(el=>{
+    let object = {
+      productId: el._id,
+      quantity: el.quantity,
+      price:{
+        value: el.price
+      }
+    }
+    cart.push(object)
+  })
+
+     Order.create({
+      customer: req.payload._id,
+      date: new Date(),
+      products: cart
+     })
+
+    .then((reponse) => {
+      res.status(201).json({message: "success"});
+      req.session.cart=[];
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: "Internal Server Error" });
+    });
+});
+
+
 module.exports = router;

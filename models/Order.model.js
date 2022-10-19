@@ -11,6 +11,7 @@ const userSchema = new Schema({
         enum: ["In progress", "send"],
         products:[
             {
+                name: String,
                 productId:{
                     type: Schema.Types.ObjectId,
                     ref: "Product"
