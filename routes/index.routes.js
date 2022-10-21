@@ -343,7 +343,6 @@ router.put("/profile", isAuthenticated, (req, res, next) => {
 })
 
 //PAYMENT
-
 router.post("/payment", isAuthenticated,(req, res, next) => {
   const { pan, name, cvv, expiry } = req.body;
 

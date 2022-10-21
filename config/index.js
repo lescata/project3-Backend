@@ -49,7 +49,9 @@ module.exports = (app) => {
       }),
       cookie:{
         httpOnly: true,
-        maxAge: parseInt(process.env.SESSION_MAX_AGE)
+        maxAge: parseInt(process.env.SESSION_MAX_AGE),
+        sameSite: 'None',
+        secure: true
       }
     })
   );
@@ -57,7 +59,6 @@ module.exports = (app) => {
   // req.session.cart
   app.use(function (req, res, next) {
     req.session.cart ||= []
-
     next()
   })
 };
